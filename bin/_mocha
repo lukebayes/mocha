@@ -14,6 +14,7 @@ var program = require('commander'),
   join = path.join,
   cwd = process.cwd(),
   getOptions = require('./options'),
+  os = require('os'),
   mocha = new Mocha;
 
 /**
@@ -71,6 +72,8 @@ program
   .option('-f, --fgrep <string>', 'only run tests containing <string>')
   .option('-gc, --expose-gc', 'expose gc extension')
   .option('-i, --invert', 'inverts --grep and --fgrep matches')
+  .option('-M, --multicore-count <number>', 'use the requested number of cores')
+  .option('-m, --multicore', 'use all available cores')
   .option('-r, --require <name>', 'require the given module')
   .option('-s, --slow <ms>', '"slow" test threshold in milliseconds [75]')
   .option('-t, --timeout <ms>', 'set test-case timeout in milliseconds [2000]')
@@ -285,6 +288,17 @@ if (program.delay) mocha.delay();
 // --globals
 
 mocha.globals(globals);
+
+// --multicore
+
+var coreCount = 1;
+
+if (program.multicore) {
+  coreCount = os.cpus().length;
+} else if (program.multicoreCount) {
+  coreCount = program.multicoreCount;
+}
+mocha.useCoreCount(coreCount);
 
 // --retries
 
