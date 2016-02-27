@@ -45,6 +45,7 @@ test-unit:
 		--reporter $(REPORTER) \
 		test/acceptance/*.js \
 		--growl \
+		test/cluster/*.js \
 		test/*.js
 
 test-integration:
