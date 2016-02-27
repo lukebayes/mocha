@@ -298,7 +298,7 @@ if (program.multicore) {
 } else if (program.multicoreCount) {
   coreCount = program.multicoreCount;
 }
-mocha.useCoreCount(coreCount);
+mocha.multicoreCount(coreCount);
 
 // --retries
 
