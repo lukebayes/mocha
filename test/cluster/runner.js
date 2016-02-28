@@ -1,3 +1,7 @@
+/**
+ * Module dependencies.
+ */
+
 var ClusterRunner = require('../../lib/cluster/runner');
 var assert = require('assert');
 var os = require('os');
@@ -38,6 +42,7 @@ describe('ClusterRunner', function() {
         'test/test.js'
       ]
     });
+
     runner.run(done);
   });
 });
