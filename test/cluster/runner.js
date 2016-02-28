@@ -27,7 +27,16 @@ describe('ClusterRunner', function() {
   });
 
   it.only('starts a worker for each core', function(done) {
-    runner = ClusterRunner.create({multicoreCount: 1});
+    runner = ClusterRunner.create({
+      multicoreCount: 1,
+      files: [
+        'test/color.js',
+        'test/grep.js',
+        'test/suite.js',
+        'test/test.js',
+        'test/utils.js'
+      ]
+    });
     runner.run(done);
   });
 });
