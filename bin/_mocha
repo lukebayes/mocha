@@ -289,16 +289,15 @@ if (program.delay) mocha.delay();
 
 mocha.globals(globals);
 
-// --multicore
+// --multicore && --multicore-count
 
 var coreCount = 1;
-
-if (program.multicore) {
-  coreCount = os.cpus().length;
-} else if (program.multicoreCount) {
+if (program.multicoreCount) {
   coreCount = program.multicoreCount;
+} else if (program.multicore) {
+  coreCount = os.cpus().length;
 }
-mocha.multicoreCount(coreCount);
+mocha.multicoreCount = coreCount;
 
 // --retries
 
@@ -368,9 +367,9 @@ if (program.watch) {
 
   function loadAndRun() {
     try {
-      mocha.files = files;
+      //mocha.files = files;
       runAgain = false;
-      runner = mocha.run(function(){
+      runner = mocha.rerunWith(files, function(){
         runner = null;
         if (runAgain) {
           rerun();
@@ -392,11 +391,11 @@ if (program.watch) {
   function rerun() {
     purge();
     stop()
-    if (!program.grep)
-      mocha.grep(null);
-    mocha.suite = mocha.suite.clone();
-    mocha.suite.ctx = new Mocha.Context;
-    mocha.ui(program.ui);
+    //if (!program.grep)
+      //mocha.grep(null);
+    //mocha.suite = mocha.suite.clone();
+    //mocha.suite.ctx = new Mocha.Context;
+    //mocha.ui(program.ui);
     loadAndRun();
   }
 

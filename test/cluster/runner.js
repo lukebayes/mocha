@@ -28,14 +28,14 @@ describe('ClusterRunner', function() {
 
   it.only('starts a worker for each core', function(done) {
     this.timeout(3000);
+
     runner = ClusterRunner.create({
-      multicoreCount: 1,
+      multicoreCount: 8,
       files: [
-        'test/color.js',
         'test/grep.js',
+        'test/color.js',
         'test/suite.js',
-        'test/test.js',
-        'test/utils.js'
+        'test/test.js'
       ]
     });
     runner.run(done);
