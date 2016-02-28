@@ -27,6 +27,7 @@ describe('ClusterRunner', function() {
   });
 
   it.only('starts a worker for each core', function(done) {
+    this.timeout(3000);
     runner = ClusterRunner.create({
       multicoreCount: 1,
       files: [
