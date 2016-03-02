@@ -4,6 +4,8 @@
  * Module dependencies.
  */
 
+console.log('----------');
+console.log('WORKER LOADED!');
 var program = require('commander'),
   path = require('path'),
   fs = require('fs'),
@@ -72,6 +74,7 @@ program
   .option('-gc, --expose-gc', 'expose gc extension')
   .option('-i, --invert', 'inverts --grep and --fgrep matches')
   .option('-m, --multicore', 'run across multiple cores')
+  .option('-M, --multicore-count <number>', 'specify number of cores to use')
   .option('-r, --require <name>', 'require the given module')
   .option('-s, --slow <ms>', '"slow" test threshold in milliseconds [75]')
   .option('-t, --timeout <ms>', 'set test-case timeout in milliseconds [2000]')
@@ -87,7 +90,6 @@ program
   .option('--harmony<_classes,_generators,...>', 'all node --harmony* flags are available')
   .option('--inline-diffs', 'display actual/expected differences inline within each string')
   .option('--interfaces', 'display available interfaces')
-  .option('--worker-count <number>', 'specific number of parallel workers to create')
   .option('--no-deprecation', 'silence deprecation warnings')
   .option('--no-exit', 'require a clean shutdown of the event loop: mocha will not call process.exit')
   .option('--no-timeouts', 'disables timeouts, given implicitly with --debug')
@@ -285,6 +287,14 @@ if (program.asyncOnly) mocha.asyncOnly();
 
 if (program.delay) mocha.delay();
 
+// --is-worker
+if (program.isWorker) {
+  mocha.isWorker();
+
+  console.log('HOLDING WORKER OPEN!');
+  setInterval(function() {}, 10000);
+}
+
 // --globals
 
 mocha.globals(globals);
@@ -292,6 +302,11 @@ mocha.globals(globals);
 // --retries
 
 if (program.retries) mocha.suite.retries(program.retries);
+
+if (program.multicoreCount || program.multicore) {
+  var multicoreCount = program.multicoreCount || require('os').cpus().length;
+  mocha.multicoreCount(multicoreCount);
+}
 
 // custom compiler support
 
@@ -402,9 +417,11 @@ if (program.watch) {
 
 // load
 
-  mocha.files = files;
-  runner = mocha.run(program.exit ? exit : exitLater);
-
+  if (!program.isWorker) {
+    // Worker will receive a run message shortly.
+    mocha.files = files;
+    runner = mocha.run(program.exit ? exit : exitLater);
+  }
 }
 
 function exitLater(code) {
@@ -412,6 +429,7 @@ function exitLater(code) {
 }
 
 function exit(code) {
+  console.log('MOCHA EXIT CALLED');
   // flush output for Node.js Windows pipe bug
   // https://github.com/joyent/node/issues/6247 is just one bug example
   // https://github.com/visionmedia/mocha/issues/333 has a good discussion
@@ -431,7 +449,7 @@ function exit(code) {
   done();
 }
 
-process.on('SIGINT', function() { runner.abort(); })
+process.on('SIGINT', function() { runner && runner.abort(); })
 
 // enable growl notifications
 
@@ -500,3 +518,4 @@ function play(arr, interval) {
     process.stdout.write('\u001b[0G' + str);
   }, interval);
 }
+
