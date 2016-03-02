@@ -290,9 +290,6 @@ if (program.delay) mocha.delay();
 // --is-worker
 if (program.isWorker) {
   mocha.isWorker();
-
-  console.log('HOLDING WORKER OPEN!');
-  setInterval(function() {}, 10000);
 }
 
 // --globals
@@ -360,12 +357,12 @@ var runner;
 if (program.watch) {
   console.log();
   hideCursor();
-  process.on('SIGINT', function(){
+  process.on('SIGINT', function() {
+    console.log('SIGINT RECEIVED!');
     showCursor();
     console.log('\n');
     process.exit();
   });
-
 
   var watchFiles = utils.files(cwd, [ 'js' ].concat(program.watchExtensions));
   var runAgain = false;
@@ -383,7 +380,7 @@ if (program.watch) {
     } catch(e) {
       console.log(e.stack);
     }
-  }
+  };
 
   function purge() {
     watchFiles.forEach(function(file){
@@ -413,15 +410,20 @@ if (program.watch) {
     }
   });
 
+} else if (program.isWorker) {
+  process.on('message', function(message) {
+    if (message.type === 'run') {
+      mocha.grep(null);
+      mocha.rerunWith([message.payload], function() {
+        process.send({type: 'worker-ready'});
+      });
+    }
+  });
+
+  process.send({type: 'worker-ready'});
 } else {
-
-// load
-
-  if (!program.isWorker) {
-    // Worker will receive a run message shortly.
-    mocha.files = files;
-    runner = mocha.run(program.exit ? exit : exitLater);
-  }
+  mocha.files = files;
+  runner = mocha.run(program.exit ? exit : exitLater);
 }
 
 function exitLater(code) {
