@@ -358,7 +358,6 @@ if (program.watch) {
   console.log();
   hideCursor();
   process.on('SIGINT', function() {
-    console.log('SIGINT RECEIVED!');
     showCursor();
     console.log('\n');
     process.exit();
@@ -371,7 +370,7 @@ if (program.watch) {
     try {
       mocha.files = files;
       runAgain = false;
-      runner = mocha.run(function(){
+      runner = mocha.run(function() {
         runner = null;
         if (runAgain) {
           rerun();
@@ -383,7 +382,7 @@ if (program.watch) {
   };
 
   function purge() {
-    watchFiles.forEach(function(file){
+    watchFiles.forEach(function(file) {
       delete require.cache[file];
     });
   }
