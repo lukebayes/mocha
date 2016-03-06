@@ -4,8 +4,6 @@
  * Module dependencies.
  */
 
-console.log('----------');
-console.log('WORKER LOADED!');
 var program = require('commander'),
   path = require('path'),
   fs = require('fs'),
