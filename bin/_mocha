@@ -411,9 +411,14 @@ if (program.watch) {
   process.on('message', function(message) {
     if (message.type === 'run') {
       mocha.grep(null);
-      mocha.rerunWith([message.payload], function() {
-        process.send({type: 'worker-ready'});
-      });
+      try {
+        runner = mocha.rerunWith([message.payload], function() {
+          runner = null;
+          process.send({type: 'worker-ready'});
+        });
+      } catch(e) {
+        console.log(e.stack);
+      }
     }
   });
 
