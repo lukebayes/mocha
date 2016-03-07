@@ -333,17 +333,24 @@ var args = program.args;
 
 // default files to test/*.{js,coffee}
 
-if (!args.length) args.push('test');
+if (!program.isWorker) {
 
-args.forEach(function(arg){
-  files = files.concat(utils.lookupFiles(arg, extensions, program.recursive));
-});
+  if (!args.length) args.push('test');
 
-// resolve
+  console.log('ARGS ARE:', args);
 
-files = files.map(function(path){
-  return resolve(path);
-});
+  args.forEach(function(arg){
+    files = files.concat(utils.lookupFiles(arg, extensions, program.recursive));
+  });
+
+  // resolve
+
+  files = files.map(function(path){
+    return resolve(path);
+  });
+}
+
+console.log('FILE COUNT:', files.length);
 
 if (program.sort) {
   files.sort();
